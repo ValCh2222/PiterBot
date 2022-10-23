@@ -455,8 +455,11 @@ def get_user_message(user_message):
         bot.send_message(user_message.chat.id, text="добавлено в избранное")
     elif user_message.text == "заменить тц":
         bot.delete_message(user_message.chat.id, user_message.message_id - 1)
-        bot.send_message(user_message.chat.id, text=get_info_about_organizations("торговый центр"))
+        text=get_info_about_organizations("торговый центр")
+        write_info_to_file(text)
+        bot.send_message(user_message.chat.id, text)
         bot.delete_message(user_message.chat.id, user_message.message_id - 2)
+
 
     elif (user_message.text in churches) or (user_message.text != ""):
         try:
