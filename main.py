@@ -14,13 +14,7 @@ bot = telebot.TeleBot('5687900058:AAGmBIKKIDAFfLyV0i6IVKP58XVZM2hXerg')
 text_info = 'Данный бот позволит Вам познакомиться с интересными местами Санкт-Петербурга !\n\n'
 
 
-def get_user_photo(message):
-    markup = types.InlineKeyboardMarkup()  # базовая кнопка
-    markup.add(types.InlineKeyboardButton("посетить веб-сайт Русского музея",
-                                          url="http://en.rusmuseum.ru/"))  # переходим на сайт русского музея
-    bot.send_message(message.chat.id, "вот сайт русского музея, посети его", reply_markup=markup)
-
-
+# первый запуск , начало работы
 @bot.message_handler(commands=['start'])  # начало работы
 def get_user_photo(message):
     message_text = 'Привет, *' + str(message.chat.first_name) + '*!\n'
@@ -42,11 +36,13 @@ def get_user_photo(message):
     bot.send_message(message.chat.id, message_text, reply_markup=markup1)
 
 
+# получение сообщений от полльзователя
 @bot.message_handler(content_types=['text'])
 def get_user_message(user_message):
     if user_message.text == "hello":
         mess = f'hello, {user_message.from_user.first_name} , my dear'  # здoроваемся
         bot.send_message(user_message.chat.id, mess, parse_mode='html')
+    # траспорт
     elif user_message.text == emoji.emojize('транспорт :bus:'):
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         metro = types.KeyboardButton(emoji.emojize('Метро :metro:'))
@@ -57,11 +53,30 @@ def get_user_message(user_message):
         back = types.KeyboardButton('в главное меню')
         markup1.add(metro, trolleibus, bus, tarif, card, back)
         bot.send_message(user_message.chat.id, "вы перешли в меню транспорт", reply_markup=markup1)
-
     elif user_message.text == emoji.emojize('Троллейбусы 🚎'):
         bot.send_photo(user_message.chat.id, "https://transphoto.org/photo/08/83/99/883994.png")
     elif user_message.text == emoji.emojize('Трамваи :tram:'):
         bot.send_photo(user_message.chat.id, "https://transphoto.org/photo/12/56/49/1256499.png?1")
+    elif user_message.text == emoji.emojize('Метро :metro:'):
+        markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        scheme = types.KeyboardButton('Схема метро')  # кнопки в самой панели, не встроенные в сообщения
+        time = types.KeyboardButton('Режим работы станций')  # кнопки в самой панели, не встроенные в сообщения
+        transport = types.KeyboardButton(emoji.emojize('транспорт :bus:'))
+        back = types.KeyboardButton('в главное меню')
+        markup1.add(scheme, time, transport, back)
+        bot.send_message(user_message.chat.id, "Вы перешли в меню метро", reply_markup=markup1)
+    elif user_message.text == emoji.emojize('Схема метро'):
+        photo = open('photos/metro.jpg', 'rb')
+        bot.send_photo(user_message.chat.id, photo)  # отправляем фото
+    elif user_message.text == emoji.emojize('Тарифы'):
+        bot.send_photo(user_message.chat.id, 'http://www.metro.spb.ru/uploads/tarif2022_1.jpg')  # отправляем фото
+    elif user_message.text == emoji.emojize('Пополнить проездной'):
+        text = '[пополнить проездной](http://www.metro.spb.ru/bzoplata.html?ysclid=l88hx9ekrf653992473)'
+        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
+    elif user_message.text == emoji.emojize('Режим работы станций'):
+        text = '[режим работы станций](http://www.metro.spb.ru/rejimrabotystancii.html?ysclid=l81yz39056997330556)'
+        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
+    # куда сходить
     elif user_message.text == emoji.emojize('куда сходить? :classical_building:'):
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         sobory = types.KeyboardButton(emoji.emojize('соборы :church:'))
@@ -75,6 +90,19 @@ def get_user_message(user_message):
         back = types.KeyboardButton('в главное меню')
         markup1.add(sobory, museums, parks, skulptures, bridges, map_of_places, cinema, back)
         bot.send_message(user_message.chat.id, "вы перешли в меню куда сходить", reply_markup=markup1)
+    elif user_message.text == emoji.emojize('карта мест :round_pushpin:'):
+        text = '[карта мест](https://yandex.ru/maps/2/saint-petersburg/category/landmark_attraction' \
+               '/89683368508/?ll=30.433514%2C59.899008&sll=30.433514%2C59.898920&z=11)'
+        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
+
+    elif user_message.text in ["Александра Невского", "Биржевой", "Благовещенский", "Большеохтинский", "Володарский",
+                               "Дворцовый", "Литейный", "Троицкий", "Тучков"]:
+        try:
+            link = bridge_inf(user_message.text)
+            bot.send_photo(user_message.chat.id, link, user_message.text)
+        except (Exception, Error) as error:
+            print("Error", error)
+    # мосты
     elif user_message.text == emoji.emojize('мосты :bridge_at_night:'):
         bridgesmas = ["Александра Невского", "Биржевой", "Благовещенский", "Большеохтинский", "Володарский",
                       "Дворцовый", "Литейный", "Троицкий", "Тучков"]
@@ -82,25 +110,23 @@ def get_user_message(user_message):
         for bridge in bridgesmas:
             bridge = types.KeyboardButton(bridge)
             markup1.add(bridge)
-
         bridges = types.KeyboardButton('график разведения мостов')
         where_to_go = types.KeyboardButton(emoji.emojize('куда сходить? :classical_building:'))
         back = types.KeyboardButton('в главное меню')
         markup1.add(bridges, where_to_go, back)
         bot.send_message(user_message.chat.id, "вы перешли в меню мосты", reply_markup=markup1)
-
     elif user_message.text == "график разведения мостов":
         bot.send_photo(user_message.chat.id,
                        "https://peterburg.center/sites/default/files/styles/long_image/public/razvod-mostov-2021.png"
                        "?itok=dAKCuKUT")
-
+    # кино
     elif user_message.text == emoji.emojize('кино :cinema:'):
         url_place = " https://kudago.com/public-api/v1.4/places/?lang=&fields" \
                     "=&expand=&order_by=&text_format=&ids=&location=spb&has_showings=&showing_since=" \
                     "1444385206&showing_until=1444385206&categories=cinema&lon=&lat=&radius="
         text = send_info_about_places(url_place)
         bot.send_message(user_message.chat.id, text)
-
+    # соборы
     elif user_message.text == emoji.emojize('соборы :church:'):
 
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -111,7 +137,7 @@ def get_user_message(user_message):
         where_to_go = types.KeyboardButton(emoji.emojize('куда сходить? :classical_building:'))
         markup1.add(where_to_go, back)
         bot.send_message(user_message.chat.id, "вы перешли в меню соборы", reply_markup=markup1)
-
+    # парки
     elif user_message.text == emoji.emojize('парки :national_park:'):
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         parks = ["Марсово поле", "Петергоф",
@@ -128,7 +154,16 @@ def get_user_message(user_message):
         where_to_go = types.KeyboardButton(emoji.emojize('куда сходить? :classical_building:'))
         markup1.add(where_to_go, back)
         bot.send_message(user_message.chat.id, "вы перешли в меню парки", reply_markup=markup1)
+    # музеи
+    elif user_message.text == emoji.emojize('музеи :classical_building:'):
 
+        text = '[музеи](https://www.culture.ru/museums/institutes/location-sankt-peterburg?ysclid=l891xtiuj7335039208)'
+        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
+    # памятники
+    elif user_message.text == emoji.emojize('памятники :fountain:'):
+        text = '[памятники](https://peterburg.center/category/pamyatniki?ysclid=l8a1uhdnii583269947)'
+        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
+    # главное меню
     elif user_message.text == "в главное меню":
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         weather = types.KeyboardButton(emoji.emojize('Прогноз погоды в Питере :sun:'))
@@ -145,9 +180,7 @@ def get_user_message(user_message):
                     favourites,
                     start)
         bot.send_message(user_message.chat.id, "вы вернулись в главное меню", reply_markup=markup1)
-    elif user_message.text == "пока":
-        bot.send_message(user_message.chat.id, "и тебе пока", parse_mode='html')
-
+    # избранное
     elif user_message.text == "избранное":
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         show = types.KeyboardButton(emoji.emojize('вывести избранное'))
@@ -163,9 +196,7 @@ def get_user_message(user_message):
     elif user_message.text == "очистить избранное":
         clear_favourites(user_message.chat.id)
         bot.send_message(user_message.chat.id, "ваш список избранных очищен")
-
-    elif user_message.text == "id":
-        bot.send_message(user_message.chat.id, f'your id: {user_message.from_user.id}', parse_mode='html')
+    # свободный поиск по организациям
     elif user_message.text == "свободный поиск по организациям":
         bot.send_message(user_message.chat.id, text="Вы можете найти интересующую вас ОРГАНИЗАЦИЮ "
                                                     "в Санкт-Петербурге, введя запрос , начинающийся со"
@@ -175,7 +206,13 @@ def get_user_message(user_message):
         back = types.KeyboardButton('в главное меню')
         markup1.add(fav, back)
         bot.send_message(user_message.chat.id, "вы перешли в меню свободный поиск ", reply_markup=markup1)
+    elif user_message.text.lower().find("найди") != -1:
+        organization = user_message.text[user_message.text.find('и', 1): len(user_message.text)]
+        text = get_info_about_organizations(organization)
+        bot.send_message(user_message.chat.id, text)
+        write_info_to_file(text)
 
+    # авиабилеты
     elif user_message.text == emoji.emojize("авиабилеты:airplane:"):
         bot.send_message(user_message.chat.id, '''Введи через пробел город отправления, город назначения и дату вылета, 
         например :Москва Санкт-Петербург 2022-12-31''')
@@ -206,32 +243,10 @@ def get_user_message(user_message):
         except Exception:
             bot.send_message(user_message.chat.id, "не удалось найти авиабилеты по указанным данным")
 
-    elif user_message.text.lower().find("найди") != -1:
-        organization = user_message.text[user_message.text.find('и', 1): len(user_message.text)]
-        text = get_info_about_organizations(organization)
-        bot.send_message(user_message.chat.id, text)
-        write_info_to_file(text)
-
     elif user_message.text == "info":
-        bot.send_message(user_message.chat.id, "и тебе пока", parse_mode='html')
-    elif user_message.text == emoji.emojize('Метро :metro:'):
-        markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-        scheme = types.KeyboardButton('Схема метро')  # кнопки в самой панели, не встроенные в сообщения
-        time = types.KeyboardButton('Режим работы станций')  # кнопки в самой панели, не встроенные в сообщения
-        transport = types.KeyboardButton(emoji.emojize('транспорт :bus:'))
-        back = types.KeyboardButton('в главное меню')
-        markup1.add(scheme, time, transport, back)
-        bot.send_message(user_message.chat.id, "Вы перешли в меню метро", reply_markup=markup1)
-
-    elif user_message.text == emoji.emojize('музеи :classical_building:'):
-
-        text = '[музеи](https://www.culture.ru/museums/institutes/location-sankt-peterburg?ysclid=l891xtiuj7335039208)'
-        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
-
-    elif user_message.text == emoji.emojize('памятники :fountain:'):
-        text = '[памятники](https://peterburg.center/category/pamyatniki?ysclid=l8a1uhdnii583269947)'
-        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
-
+        bot.send_message(user_message.chat.id, "используй меню, или напиши /start , чтобы начать работу",
+                         parse_mode='html')
+    # где поесть
     elif user_message.text == emoji.emojize('где поесть? :pot_of_food:'):
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         restaurants = types.KeyboardButton(emoji.emojize('рестораны 🥘'))
@@ -242,7 +257,13 @@ def get_user_message(user_message):
         markup1.add(restaurants, fastfood, national_kitchen, kafe, back)
         bot.send_message(user_message.chat.id, "вы перешли в меню где поесть\n Выбери категорию заведения, и бот "
                                                "порекомендует тебе место", reply_markup=markup1)
-
+    # погода- прогноз погоды
+    elif user_message.text == emoji.emojize('Прогноз погоды в Питере :sun:'):
+        get_weather()
+        my_file = open("BabyFile.txt", "r")
+        prognos = my_file.read()
+        bot.send_message(user_message.chat.id, prognos)
+    # где остановиться
     elif user_message.text == emoji.emojize('где остановиться? :hotel:'):
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         hotel = types.KeyboardButton(emoji.emojize('отели :hotel:'))
@@ -253,36 +274,7 @@ def get_user_message(user_message):
         bot.send_message(user_message.chat.id,
                          "вы перешли в меню где остановиться \n Выбери категорию заведения, и бот "
                          "порекомендует тебе место", reply_markup=markup1)
-
-    elif user_message.text == emoji.emojize('Прогноз погоды в Питере :sun:'):
-        get_weather()
-        my_file = open("BabyFile.txt", "r")
-        prognos = my_file.read()
-        bot.send_message(user_message.chat.id, prognos)
-    elif user_message.text == emoji.emojize('Схема метро'):
-        photo = open('photos/metro.jpg', 'rb')
-        bot.send_photo(user_message.chat.id, photo)  # отправляем фото
-    elif user_message.text == emoji.emojize('Тарифы'):
-        bot.send_photo(user_message.chat.id, 'http://www.metro.spb.ru/uploads/tarif2022_1.jpg')  # отправляем фото
-    elif user_message.text == emoji.emojize('Пополнить проездной'):
-        text = '[пополнить проездной](http://www.metro.spb.ru/bzoplata.html?ysclid=l88hx9ekrf653992473)'
-        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
-
-    elif user_message.text == emoji.emojize('карта мест :round_pushpin:'):
-        text = '[карта мест](https://yandex.ru/maps/2/saint-petersburg/category/landmark_attraction' \
-               '/89683368508/?ll=30.433514%2C59.899008&sll=30.433514%2C59.898920&z=11)'
-        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
-
-    elif user_message.text in ["Александра Невского", "Биржевой", "Благовещенский", "Большеохтинский", "Володарский",
-                               "Дворцовый", "Литейный", "Троицкий", "Тучков"]:
-        try:
-            link = bridge_inf(user_message.text)
-            bot.send_photo(user_message.chat.id, link, user_message.text)
-        except (Exception, Error) as error:
-            print("Error", error)
-    elif user_message.text == emoji.emojize('Режим работы станций'):
-        text = '[режим работы станций](http://www.metro.spb.ru/rejimrabotystancii.html?ysclid=l81yz39056997330556)'
-        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
+    #аренда жилья
     elif user_message.text == emoji.emojize('арендовать жильё :house:'):
         text = '[Яндекс недвижимость](https://realty.yandex.ru/sankt-' \
                'peterburg_i_leningradskaya_oblast/snyat/' \
@@ -292,25 +284,18 @@ def get_user_message(user_message):
                '_poisk&ad_source=arenda_tenant&_openstat=ZGlyZWN' \
                '0LnlhbmRleC5ydTs2Nzk5Mjk3MTsxMTY4Mzk1MzQxMTt5YW5kZXgucnU6' \
                'cHJlbWl1bQ&yclid=109208318119247871)' + '\n'
-        text +='[Суточно.ру](https://sutochno.ru/front/searchapp/search?utm_source' \
-               '=yandex&utm_medium=cpc&utm_campaign=dsa' \
-               '-feed-spb&utm_content=not-room%7C%D0%9D%D0%B5%20%D0%BA%D0%BE%D0%BC%D' \
-               '0%BD%D0%B0%D1%82%D1%8B.%20%D0%9F%D0%B5' \
-               '%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%7C2463039&_openstat=ZGlyZWN0Lnl' \
-               'hbmRleC5ydTs2NDY5OTk3NTsxMjEzNTQ2' \
-               'MTE3ODt5YW5kZXgucnU6cHJlbWl1bQ&yclid=7392688767764791295&wp_processed=1&gu' \
-               'ests_adults=1&id=19857&type=regio' \
-               'n&term=%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0' \
-               '%B1%D1%83%D1%80%D0%B3%20%D0%B8%20%D0' \
-               '%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C&SW.lat=55.11815565781725&SW.lng' \
-               '=28.382685016840703&NE.lat=62.7181405' \
-               '1898133&NE.lng=40.86315376684069)' + '\n'
-        text += '[Циан](https://spb.cian.ru/snyat/?utm_source=yandex&utm_medium=' \
-                'cpc&utm_content=snyat-kvartiru-sankt-peterburg-metro_2581826&utm_' \
-                'campaign=b2c_spb_dsa_subreg_rentsec_mix_search_71820814&_openstat=' \
-                'ZGlyZWN0LnlhbmRleC5ydTs3MTgyMDgxNDsxMjMxMDExNzMyNTt5YW5kZXgucnU6cHJ' \
-                'lbWl1bQ&yclid=3681028036823351295)' + '\n'
         bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
+    #меню отели
+    elif user_message.text == emoji.emojize('отели :hotel:'):
+        markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        hotel = types.KeyboardButton(emoji.emojize('вывести отель'))
+        change = types.KeyboardButton(emoji.emojize('заменить отель'))
+        add_fav = types.KeyboardButton(emoji.emojize('добавить в избранное'))
+        back = types.KeyboardButton('в главное меню')
+        where_to_stay = types.KeyboardButton(emoji.emojize('где остановиться? :hotel:'))
+        markup1.add(hotel, change, add_fav, where_to_stay, back)
+        bot.send_message(user_message.chat.id,
+                         "вы перешли в меню отели", reply_markup=markup1)
     elif user_message.text == "вывести отель":
         text = get_info_about_organizations("вывести отель")
         bot.send_message(user_message.chat.id, text)
@@ -324,8 +309,8 @@ def get_user_message(user_message):
         bot.delete_message(user_message.chat.id, user_message.message_id - 1)
         bot.send_message(user_message.chat.id, text=get_info_about_organizations("Отели"))
         bot.delete_message(user_message.chat.id, user_message.message_id - 2)
+    # меню хостелы
     elif user_message.text == emoji.emojize('хостелы :bed:'):
-
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         hotel = types.KeyboardButton(emoji.emojize('вывести хостел'))
         change = types.KeyboardButton(emoji.emojize('заменить хостел'))
@@ -334,7 +319,7 @@ def get_user_message(user_message):
         where_to_stay = types.KeyboardButton(emoji.emojize('где остановиться? :hotel:'))
         markup1.add(hotel, change, add_fav, where_to_stay, back)
         bot.send_message(user_message.chat.id,
-                         "вы перешли в меню отели", reply_markup=markup1)
+                         "вы перешли в меню хостелы", reply_markup=markup1)
     elif user_message.text == "вывести хостел":
         text = get_info_about_organizations("хостелы")
         bot.send_message(user_message.chat.id, text)
@@ -348,17 +333,6 @@ def get_user_message(user_message):
         bot.delete_message(user_message.chat.id, user_message.message_id - 1)
         bot.send_message(user_message.chat.id, text=get_info_about_organizations("Хостелы"))
         bot.delete_message(user_message.chat.id, user_message.message_id - 2)
-
-    elif user_message.text == emoji.emojize('отели :hotel:'):
-        markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-        hotel = types.KeyboardButton(emoji.emojize('вывести отель'))
-        change = types.KeyboardButton(emoji.emojize('заменить отель'))
-        add_fav = types.KeyboardButton(emoji.emojize('добавить в избранное'))
-        back = types.KeyboardButton('в главное меню')
-        where_to_stay = types.KeyboardButton(emoji.emojize('где остановиться? :hotel:'))
-        markup1.add(hotel, change, add_fav, where_to_stay, back)
-        bot.send_message(user_message.chat.id,
-                         "вы перешли в меню отели", reply_markup=markup1)
 
     # меню кафе
     elif user_message.text == emoji.emojize('кафе :doughnut:'):
@@ -460,7 +434,7 @@ def get_user_message(user_message):
         bot.delete_message(user_message.chat.id, user_message.message_id - 1)
         bot.send_message(user_message.chat.id, text=get_info_about_organizations("ресторан азиатской кухни"))
         bot.delete_message(user_message.chat.id, user_message.message_id - 2)
-
+    # меню торговые центры
     elif user_message.text == emoji.emojize('торговые центры:shopping_bags:'):
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         hotel = types.KeyboardButton(emoji.emojize('вывести торговый центр'))
