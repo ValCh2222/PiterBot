@@ -283,7 +283,34 @@ def get_user_message(user_message):
     elif user_message.text == emoji.emojize('Режим работы станций'):
         text = '[режим работы станций](http://www.metro.spb.ru/rejimrabotystancii.html?ysclid=l81yz39056997330556)'
         bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
-
+    elif user_message.text == emoji.emojize('арендовать жильё :house:'):
+        text = '[Яндекс недвижимость](https://realty.yandex.ru/sankt-' \
+               'peterburg_i_leningradskaya_oblast/snyat/' \
+               'kvartira/?sort=CONFIDENCE&utm_source=yandex_direct&utm' \
+               '_medium=direct_rent&utm_content=11683953411_' \
+               '37229677859&utm_campaign=460_67992971_poisk_tgo_rent_spb' \
+               '_poisk&ad_source=arenda_tenant&_openstat=ZGlyZWN' \
+               '0LnlhbmRleC5ydTs2Nzk5Mjk3MTsxMTY4Mzk1MzQxMTt5YW5kZXgucnU6' \
+               'cHJlbWl1bQ&yclid=109208318119247871)' + '\n'
+        text +='[Суточно.ру](https://sutochno.ru/front/searchapp/search?utm_source' \
+               '=yandex&utm_medium=cpc&utm_campaign=dsa' \
+               '-feed-spb&utm_content=not-room%7C%D0%9D%D0%B5%20%D0%BA%D0%BE%D0%BC%D' \
+               '0%BD%D0%B0%D1%82%D1%8B.%20%D0%9F%D0%B5' \
+               '%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%7C2463039&_openstat=ZGlyZWN0Lnl' \
+               'hbmRleC5ydTs2NDY5OTk3NTsxMjEzNTQ2' \
+               'MTE3ODt5YW5kZXgucnU6cHJlbWl1bQ&yclid=7392688767764791295&wp_processed=1&gu' \
+               'ests_adults=1&id=19857&type=regio' \
+               'n&term=%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0' \
+               '%B1%D1%83%D1%80%D0%B3%20%D0%B8%20%D0' \
+               '%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C&SW.lat=55.11815565781725&SW.lng' \
+               '=28.382685016840703&NE.lat=62.7181405' \
+               '1898133&NE.lng=40.86315376684069)' + '\n'
+        text += '[Циан](https://spb.cian.ru/snyat/?utm_source=yandex&utm_medium=' \
+                'cpc&utm_content=snyat-kvartiru-sankt-peterburg-metro_2581826&utm_' \
+                'campaign=b2c_spb_dsa_subreg_rentsec_mix_search_71820814&_openstat=' \
+                'ZGlyZWN0LnlhbmRleC5ydTs3MTgyMDgxNDsxMjMxMDExNzMyNTt5YW5kZXgucnU6cHJ' \
+                'lbWl1bQ&yclid=3681028036823351295)' + '\n'
+        bot.send_message(user_message.chat.id, text, parse_mode='MarkdownV2')
     elif user_message.text == "вывести отель":
         text = get_info_about_organizations("вывести отель")
         bot.send_message(user_message.chat.id, text)
