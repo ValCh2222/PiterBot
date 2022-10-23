@@ -206,7 +206,7 @@ def show_favourites(chat_id):
                                       database='chatBot')
 
         cursor = connection.cursor()
-        cursor.execute(f" SELECT information FROM favourites WHERE chat_id=%s", (chat_id,))
+        cursor.execute(f" SELECT information FROM favourites WHERE chat_id=%s", (str(chat_id),))
 
         rows = cursor.fetchall()
         connection.commit()
