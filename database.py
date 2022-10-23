@@ -41,7 +41,6 @@ def bridge_inf(message):
                                   database="chatBot")
 
     cursor = connection.cursor()
-    string = message
     cursor.execute(f" SELECT  PHOTO FROM bridges WHERE Name_of_Bridge =%s", (message,))
     rows2 = cursor.fetchall()
     for row in rows2:
@@ -130,7 +129,10 @@ def get_info_flight(message):
 def write_info_to_file(text):
     my_file = open("mes.txt", "w")
     my_file.flush()
-    my_file.write(text)
+    try:
+        my_file.write(text)
+    except UnicodeEncodeError:
+        print(UnicodeEncodeError.args)
 
 
 def add_favourites(chat_id, message):
@@ -204,7 +206,6 @@ def show_favourites(chat_id):
                                       database='chatBot')
 
         cursor = connection.cursor()
-        chat_id = '1104205418'
         cursor.execute(f" SELECT information FROM favourites WHERE chat_id=%s", (chat_id,))
 
         rows = cursor.fetchall()
@@ -219,10 +220,7 @@ def show_favourites(chat_id):
         if connection:
             cursor.close()
             connection.close()
-    if (text == ""):
+    if text == "":
         return "у вас пока нет ничего в избранном"
     else:
         return text
-
-
-

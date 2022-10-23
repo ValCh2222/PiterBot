@@ -15,17 +15,17 @@ def get_info_about_organizations(organization_type):
     try:
         text += d["features"][i]["properties"]["CompanyMetaData"]["address"] + "\n"
     except Exception:
-        print('')
+        print(Exception)
     try:
         url = d["features"][i]["properties"]["CompanyMetaData"]["url"] + "\n"
         text += url
     except Exception:
-        print('')
+        print(Exception)
     try:
         text += d["features"][i]["properties"]["CompanyMetaData"]["Phones"][0]["formatted"] + "\n"
 
     except Exception:
-        print('')
+        print(Exception)
 
     try:
         text += d["features"][i]["properties"]["CompanyMetaData"]["Hours"]["text"] + "\n"
